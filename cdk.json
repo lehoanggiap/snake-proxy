@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node --prefer-ts-exts bin/snake-vpn.ts",
+  "app": "npx ts-node --prefer-ts-exts bin/squid-proxy.ts",
   "watch": {
     "include": [
       "**"
@@ -83,27 +83,6 @@
     "@aws-cdk/aws-elasticloadbalancingV2:albDualstackWithoutPublicIpv4SecurityGroupRulesDefault": true,
     "@aws-cdk/aws-iam:oidcRejectUnauthorizedConnections": true,
     "@aws-cdk/core:enableAdditionalMetadataCollection": true,
-    "@aws-cdk/aws-lambda:createNewPoliciesWithAddToRolePolicy": true,
-    
-    "common": {
-      "parentHostedZoneId": "<HOSTED_ZONE_ID>",
-      "parentDomainName": "<PARENT_DOMAIN>",
-      "region": "ap-southeast-1",
-      "whitelistDomainsParameter": "/snake-dns/whilelist-domains",
-      "accountId": "<ACCOUNT_ID>"
-    },
-    
-    "dev": {
-      "domainName": "<DEV_DOMAIN>",
-      "subdomain": "<SUBDOMAIN>",
-      "yourIp": "<YOUR_IP>/32",
-      "vpcId": "<VPC_ID>"
-    },
-    "prod": {
-      "domainName": "<PROD_DOMAIN>",
-      "subdomain": "<SUBDOMAIN>",
-      "yourIp": "<YOUR_IP>/32",
-      "vpcId": "<VPC_ID>"
-    }
+    "@aws-cdk/aws-lambda:createNewPoliciesWithAddToRolePolicy": true
   }
 }
