@@ -57,11 +57,10 @@ export class SnakeVPNLoadBalancer extends Construct {
 
   public addTarget(asg: autoscaling.AutoScalingGroup) {
     // Only keep UDP target group and its attachment
-    const ipTargetGroup = new elbv2.NetworkTargetGroup(this, `Snake-NLB-IPTargetGroup-${this.environment}`, {
+    const udpTargetGroup = new elbv2.NetworkTargetGroup(this, `Snake-NLB-UdpTargetGroup-${this.environment}`, {
       vpc: this.vpc,
       port: 51820,
       protocol: elbv2.Protocol.UDP,
-      targetType: elbv2.TargetType.IP,
       healthCheck: {
         protocol: elbv2.Protocol.TCP, // Health check over TCP (UDP health checks are not supported)
         port: '80', // Health check port (use TCP port 80 for health checks)
@@ -69,8 +68,8 @@ export class SnakeVPNLoadBalancer extends Construct {
         unhealthyThresholdCount: 3,
       },
     });
-    ipTargetGroup.addTarget(asg);
-    this.udpListener.addTargetGroups(`Snake-NLB-IPTargetGroup-${this.environment}`, ipTargetGroup);
+    udpTargetGroup.addTarget(asg);
+    this.udpListener.addTargetGroups(`Snake-NLB-UdpTargetGroup-${this.environment}`, udpTargetGroup);
 
     // Create a CodeDeploy Application
     const application = new codedeploy.ServerApplication(this, `Snake-CodeDeploy-Application-${this.environment}`, {
@@ -91,7 +90,7 @@ export class SnakeVPNLoadBalancer extends Construct {
         ],
       }),
       loadBalancers: [
-        codedeploy.LoadBalancer.network(ipTargetGroup),
+        codedeploy.LoadBalancer.network(udpTargetGroup),
       ],
     });
   }
