@@ -5,6 +5,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 
 export interface SnakeVPNServerProps {
@@ -47,10 +48,26 @@ export class SnakeVPNServer extends Construct {
       clientPublicKey,
     } = props;
 
-    this.serverPrivateKey = serverPrivateKey;
-    this.serverPublicKey = serverPublicKey;
-    this.clientPrivateKey = clientPrivateKey;
-    this.clientPublicKey = clientPublicKey;
+    this.serverPrivateKey = ssm.StringParameter.fromStringParameterName(
+      this,
+      `Snake-Server-Private-Key-${environment}`,
+      serverPrivateKey,
+    ).stringValue;
+    this.serverPublicKey = ssm.StringParameter.fromStringParameterName(
+      this,
+      `Snake-Server-Public-Key-${environment}`,
+      serverPublicKey,
+    ).stringValue;
+    this.clientPrivateKey = ssm.StringParameter.fromStringParameterName(
+      this,
+      `Snake-Client-Private-Key-${environment}`,
+      clientPrivateKey,
+    ).stringValue;
+    this.clientPublicKey = ssm.StringParameter.fromStringParameterName(
+      this,
+      `Snake-Client-Public-Key-${environment}`,
+      clientPublicKey,
+    ).stringValue;
 
     // Create security group for EC2 instance
     this.securityGroup = new ec2.SecurityGroup(this, `Snake-Server-Security-Group-${environment}`, {
