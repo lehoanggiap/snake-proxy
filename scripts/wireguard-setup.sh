@@ -41,11 +41,10 @@ sudo mkdir -p /etc/wireguard
 sudo cd /etc/wireguard
 umask 077
 
-# Generate server private and public keys
-sudo wg genkey | tee server_private_key | wg pubkey > server_public_key
-
-# Generate client private and public keys
-sudo wg genkey | tee client_private_key | wg pubkey > client_public_key
+SERVER_PRIVATE_KEY="__SERVER_PRIVATE_KEY__"
+SERVER_PUBLIC_KEY="__SERVER_PUBLIC_KEY__"
+CLIENT_PRIVATE_KEY="__CLIENT_PRIVATE_KEY__"
+CLIENT_PUBLIC_KEY="__CLIENT_PUBLIC_KEY__"
 
 # Get the Load Balancer IP
 LB_IP=$(dig +short __FULL_DOMAIN_NAME__ | head -n 1)
@@ -71,7 +70,7 @@ sudo systemctl enable wg-quick@wg0
 # Create server configuration file
 cat > /etc/wireguard/wg0.conf << EOF
 [Interface]
-PrivateKey = $(cat server_private_key)
+PrivateKey = $SERVER_PRIVATE_KEY
 Address = 10.20.10.1/24
 ListenPort = 51820
 PostUp = iptables -A FORWARD -i wg0 -j ACCEPT
@@ -80,7 +79,7 @@ PostDown = iptables -D FORWARD -i wg0 -j ACCEPT
 PostDown = iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
 
 [Peer]
-PublicKey = $(cat client_public_key)
+PublicKey = $CLIENT_PUBLIC_KEY
 AllowedIPs = 10.20.10.2/32
 EOF
 
@@ -90,12 +89,12 @@ sudo systemctl start wg-quick@wg0
 # Create client configuration file
 cat > /etc/wireguard/client.conf << EOF
 [Interface]
-PrivateKey = $(cat client_private_key)
+PrivateKey = $CLIENT_PRIVATE_KEY
 Address = 10.20.10.2/24
 DNS = 8.8.8.8
 
 [Peer]
-PublicKey = $(cat server_public_key)
+PublicKey = $SERVER_PUBLIC_KEY
 Endpoint = ${LB_IP}:51820
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 25

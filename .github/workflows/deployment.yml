@@ -54,6 +54,10 @@ jobs:
           YOUR_IP: ${{ secrets.YOUR_IP }}
           REGION: ${{ secrets.REGION }}
           WHITELIST_DOMAINS: ${{ secrets.WHITELIST_DOMAINS }}
+          SERVER_PRIVATE_KEY: ${{ secrets.SERVER_PRIVATE_KEY }}
+          SERVER_PUBLIC_KEY: ${{ secrets.SERVER_PUBLIC_KEY }}
+          CLIENT_PRIVATE_KEY: ${{ secrets.CLIENT_PRIVATE_KEY }}
+          CLIENT_PUBLIC_KEY: ${{ secrets.CLIENT_PUBLIC_KEY }}
         run: |
           npx cdk deploy --require-approval never \
             -c env=${ENV} \
@@ -65,4 +69,8 @@ jobs:
             -c domainName=${DOMAIN_NAME} \
             -c subdomain=${SUBDOMAIN} \
             -c yourIp=${YOUR_IP} \
-            -c whitelistDomainsParameter=${WHITELIST_DOMAINS}
+            -c whitelistDomainsParameter=${WHITELIST_DOMAINS} \
+            -c serverPrivateKey=${SERVER_PRIVATE_KEY} \
+            -c serverPublicKey=${SERVER_PUBLIC_KEY} \
+            -c clientPrivateKey=${CLIENT_PRIVATE_KEY} \
+            -c clientPublicKey=${CLIENT_PUBLIC_KEY}

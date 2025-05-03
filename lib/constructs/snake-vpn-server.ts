@@ -17,11 +17,19 @@ export interface SnakeVPNServerProps {
   nlbSecurityGroup: ec2.ISecurityGroup;
   vpcSubnets?: ec2.SubnetSelection;
   malwareProtectionDnsIp?: string;
+  serverPrivateKey: string;
+  serverPublicKey: string;
+  clientPrivateKey: string;
+  clientPublicKey: string;
 }
 
 export class SnakeVPNServer extends Construct {
   public readonly autoScalingGroup: autoscaling.AutoScalingGroup;
   public readonly securityGroup: ec2.SecurityGroup;
+  private readonly serverPrivateKey: string;
+  private readonly serverPublicKey: string;
+  private readonly clientPrivateKey: string;
+  private readonly clientPublicKey: string;
 
   constructor(scope: Construct, id: string, props: SnakeVPNServerProps) {
     super(scope, id);
@@ -33,7 +41,16 @@ export class SnakeVPNServer extends Construct {
       nlbSecurityGroup,
       vpcSubnets,
       malwareProtectionDnsIp,
+      serverPrivateKey,
+      serverPublicKey,
+      clientPrivateKey,
+      clientPublicKey,
     } = props;
+
+    this.serverPrivateKey = serverPrivateKey;
+    this.serverPublicKey = serverPublicKey;
+    this.clientPrivateKey = clientPrivateKey;
+    this.clientPublicKey = clientPublicKey;
 
     // Create security group for EC2 instance
     this.securityGroup = new ec2.SecurityGroup(this, `Snake-Server-Security-Group-${environment}`, {
@@ -103,6 +120,10 @@ export class SnakeVPNServer extends Construct {
 
     // Replace placeholders with actual values
     script = script.replace('__FULL_DOMAIN_NAME__', fullDomainName);
+    script = script.replace('__SERVER_PRIVATE_KEY__', this.serverPrivateKey);
+    script = script.replace('__SERVER_PUBLIC_KEY__', this.serverPublicKey);
+    script = script.replace('__CLIENT_PRIVATE_KEY__', this.clientPrivateKey);
+    script = script.replace('__CLIENT_PUBLIC_KEY__', this.clientPublicKey);
 
     // If we have a malware protection DNS IP, add it to the script
     if (malwareProtectionDnsIp) {

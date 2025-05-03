@@ -22,6 +22,10 @@ const domainName = app.node.tryGetContext('domainName');
 const subdomain = app.node.tryGetContext('subdomain');
 const yourIp = app.node.tryGetContext('yourIp');
 const whitelistDomainsParameter = app.node.tryGetContext('whitelistDomainsParameter');
+const serverPrivateKey = app.node.tryGetContext('serverPrivateKey');
+const serverPublicKey = app.node.tryGetContext('serverPublicKey');
+const clientPrivateKey = app.node.tryGetContext('clientPrivateKey');
+const clientPublicKey = app.node.tryGetContext('clientPublicKey');
 
 // Build config objects
 const commonConfig = {
@@ -37,6 +41,10 @@ const envConfig = {
   domainName,
   subdomain,
   yourIp,
+  serverPrivateKey,
+  serverPublicKey,
+  clientPrivateKey,
+  clientPublicKey,
 };
 
 // Log the configuration being used

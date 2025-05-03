@@ -76,6 +76,10 @@ export class SnakeVpnStack extends cdk.Stack {
       nlbSecurityGroup: snakeNlb.securityGroup,
       vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
       malwareProtectionDnsIp: malwareDnsIp, // Pass the DNS IP directly to the VPN server
+      serverPrivateKey: envConfig.serverPrivateKey,
+      serverPublicKey: envConfig.serverPublicKey,
+      clientPrivateKey: envConfig.clientPrivateKey,
+      clientPublicKey: envConfig.clientPublicKey,
     });
 
     // Add VPN server as target to NLB
