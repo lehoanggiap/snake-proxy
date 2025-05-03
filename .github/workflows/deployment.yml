@@ -59,7 +59,7 @@ jobs:
           CLIENT_PRIVATE_KEY: ${{ secrets.CLIENT_PRIVATE_KEY }}
           CLIENT_PUBLIC_KEY: ${{ secrets.CLIENT_PUBLIC_KEY }}
         run: |
-          npx cdk deploy --require-approval never \
+          npx cdk deploy --require-approval never --all \
             -c env=${ENV} \
             -c parentHostedZoneId=${PARENT_HOSTED_ZONE_ID} \
             -c parentDomainName=${PARENT_DOMAIN_NAME} \
