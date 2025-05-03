@@ -92,7 +92,7 @@ cat > /etc/wireguard/client.conf << EOF
 [Interface]
 PrivateKey = $CLIENT_PRIVATE_KEY
 Address = 10.20.10.2/24
-DNS = 8.8.8.8
+DNS = $CLIENT_DNS
 
 [Peer]
 PublicKey = $SERVER_PUBLIC_KEY
