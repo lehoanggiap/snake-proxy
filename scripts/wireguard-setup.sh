@@ -73,9 +73,7 @@ PrivateKey = $SERVER_PRIVATE_KEY
 Address = 10.20.10.1/24
 ListenPort = 51820
 PostUp = iptables -A FORWARD -i wg0 -j ACCEPT
-PostUp = iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 PostDown = iptables -D FORWARD -i wg0 -j ACCEPT
-PostDown = iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
 
 [Peer]
 PublicKey = $CLIENT_PUBLIC_KEY
@@ -104,6 +102,12 @@ EOF
 # Enable IP forwarding permanently
 echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/99-wireguard.conf
 sysctl -p /etc/sysctl.d/99-wireguard.conf
+
+echo "Add basic firewall rules"
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -F
+service iptables save
 
 # Final message and QR code
 
