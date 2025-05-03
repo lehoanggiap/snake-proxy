@@ -23,7 +23,12 @@ Content-Disposition: attachment; filename="userdata.txt"
 sudo dnf clean all
 
 # Install required packages
-sudo dnf install -y jq awscli qrencode wireguard-tools
+sudo dnf install -y jq awscli qrencode iptables-services wireguard-tools
+
+# Set up iptables
+echo "Setting up iptables"
+sudo systemctl enable iptables
+sudo systemctl start iptables
 
 # Install AWS SSM Agent
 sudo dnf install -y amazon-ssm-agent
