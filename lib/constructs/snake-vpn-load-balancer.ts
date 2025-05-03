@@ -9,13 +9,11 @@ export interface SnakeVPNLoadBalancerProps {
   vpc: ec2.IVpc;
   environment: string;
   yourIp: string;
-  certificateArn: string;
 }
 
 export class SnakeVPNLoadBalancer extends Construct {
   public readonly nlb: elbv2.NetworkLoadBalancer;
   public readonly securityGroup: ec2.SecurityGroup;
-  public readonly httpsListener: elbv2.NetworkListener;
   public readonly udpListener: elbv2.NetworkListener;
   public readonly vpc: ec2.IVpc;
   public readonly environment: string;
@@ -23,7 +21,7 @@ export class SnakeVPNLoadBalancer extends Construct {
   constructor(scope: Construct, id: string, props: SnakeVPNLoadBalancerProps) {
     super(scope, id);
 
-    const { vpc, environment, yourIp, certificateArn } = props;
+    const { vpc, environment, yourIp } = props;
 
     this.vpc = vpc;
     this.environment = environment;
@@ -34,13 +32,6 @@ export class SnakeVPNLoadBalancer extends Construct {
       description: `Security group for NLB endpoints (${environment})`,
       allowAllOutbound: true,
     });
-
-    // Allow HTTPS access only from your IP for web config
-    this.securityGroup.addIngressRule(
-      ec2.Peer.ipv4(yourIp),
-      ec2.Port.tcp(443),
-      'Allow HTTPS access from your IP',
-    );
 
     // Allow WireGuard VPN access only from your IP
     this.securityGroup.addIngressRule(
@@ -57,13 +48,6 @@ export class SnakeVPNLoadBalancer extends Construct {
       securityGroups: [this.securityGroup],
     });
 
-    // Create HTTPS listener for web config
-    this.httpsListener = this.nlb.addListener(`Snake-NLB-HTTPListener-${environment}`, {
-      port: 443,
-      certificates: [{ certificateArn }],
-      protocol: elbv2.Protocol.TLS,
-    });
-
     // Create UDP listener for WireGuard
     this.udpListener = this.nlb.addListener(`Snake-NLB-UDPListener-${environment}`, {
       port: 51820,
@@ -72,19 +56,7 @@ export class SnakeVPNLoadBalancer extends Construct {
   }
 
   public addTarget(asg: autoscaling.AutoScalingGroup) {
-
-    // Add target groups
-    const httpsTargetGroup = new elbv2.NetworkTargetGroup(this, `Snake-NLB-HttpsTargetGroup-${this.environment}`, {
-      vpc: this.vpc,
-      port: 80,
-      protocol: elbv2.Protocol.TCP,
-      healthCheck: {
-        protocol: elbv2.Protocol.TCP, // Health check over TCP
-        healthyThresholdCount: 3, // Number of consecutive health checks to consider healthy
-        unhealthyThresholdCount: 3, // Number of consecutive health checks to consider unhealthy
-      },
-    });
-
+    // Only keep UDP target group and its attachment
     const udpTargetGroup = new elbv2.NetworkTargetGroup(this, `Snake-NLB-UdpTargetGroup-${this.environment}`, {
       vpc: this.vpc,
       port: 51820,
@@ -96,12 +68,7 @@ export class SnakeVPNLoadBalancer extends Construct {
         unhealthyThresholdCount: 3,
       },
     });
-
-    // Attach the Auto Scaling Group to both target groups
-    httpsTargetGroup.addTarget(asg);
     udpTargetGroup.addTarget(asg);
-
-    this.httpsListener.addTargetGroups(`Snake-NLB-HttpsTargetGroup-${this.environment}`, httpsTargetGroup);
     this.udpListener.addTargetGroups(`Snake-NLB-UdpTargetGroup-${this.environment}`, udpTargetGroup);
 
     // Create a CodeDeploy Application
@@ -123,10 +90,8 @@ export class SnakeVPNLoadBalancer extends Construct {
         ],
       }),
       loadBalancers: [
-        codedeploy.LoadBalancer.network(httpsTargetGroup),
         codedeploy.LoadBalancer.network(udpTargetGroup),
       ],
     });
-
   }
 }

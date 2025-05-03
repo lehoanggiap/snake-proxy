@@ -4,7 +4,6 @@ import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as route53Targets from 'aws-cdk-lib/aws-route53-targets';
 import { Construct } from 'constructs';
 
-import { SnakeACM } from '../constructs/snake-acm-cert';
 import { SnakeVPNLoadBalancer } from '../constructs/snake-vpn-load-balancer';
 import { SnakeVPNServer } from '../constructs/snake-vpn-server';
 import { CommonConfig, EnvironmentConfig } from '../models';
@@ -34,23 +33,10 @@ export class SnakeVpnStack extends cdk.Stack {
       zoneName: envConfig.domainName,
     });
 
-    // Create DNS configuration and ACM certificate first
-    const snakeACM = new SnakeACM(this, `Snake-ACM-${environment}`, {
-      domainName: envConfig.domainName,
-      environment,
-      domainHostedZone,
-    });
-
-    // Create Network Load Balancer with the certificate from SnakeACM
-    if (!snakeACM.certificate) {
-      throw new Error('Certificate is required for NLB');
-    }
-
     const snakeNlb = new SnakeVPNLoadBalancer(this, `Snake-VPN-Load-Balancer-${environment}`, {
       vpc: snakeVpc,
       environment,
       yourIp: envConfig.yourIp,
-      certificateArn: snakeACM.certificate.certificateArn,
     });
 
     // Get the malware protection DNS IP from either props or import from CloudFormation
