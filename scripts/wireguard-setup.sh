@@ -86,6 +86,8 @@ EOF
 # Start the WireGuard service
 sudo systemctl start wg-quick@wg0
 
+ENDPOINT="__FULL_DOMAIN_NAME__:51820"
+
 # Create client configuration file
 cat > /etc/wireguard/client.conf << EOF
 [Interface]
@@ -95,7 +97,7 @@ DNS = 8.8.8.8
 
 [Peer]
 PublicKey = $SERVER_PUBLIC_KEY
-Endpoint = __FULL_DOMAIN_NAME__:51820
+Endpoint = $ENDPOINT
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 25
 EOF
