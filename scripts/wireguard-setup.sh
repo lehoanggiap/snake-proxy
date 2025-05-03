@@ -72,8 +72,10 @@ cat > /etc/wireguard/wg0.conf << EOF
 PrivateKey = $SERVER_PRIVATE_KEY
 Address = 10.20.10.1/24
 ListenPort = 51820
-PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT
+PostUp = iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT
+PostDown = iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
 
 [Peer]
 PublicKey = $CLIENT_PUBLIC_KEY
