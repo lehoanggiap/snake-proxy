@@ -95,7 +95,7 @@ DNS = 8.8.8.8
 
 [Peer]
 PublicKey = $SERVER_PUBLIC_KEY
-Endpoint = ${LB_IP}:51820
+Endpoint = __FULL_DOMAIN_NAME__:51820
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 25
 EOF
