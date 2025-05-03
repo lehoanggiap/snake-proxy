@@ -125,3 +125,25 @@ qrencode -t ANSIUTF8 < /etc/wireguard/client.conf
 
 echo "\nTo retrieve your config, use AWS SSM Session Manager to access the file securely."
 echo "You can also copy the config from /etc/wireguard/client.conf if needed."
+
+# Install Python if not already present (should be on AL2023 by default)
+sudo dnf install -y python3
+
+# Create a minimal health check server script
+cat > /usr/local/bin/healthcheck-server.py << EOF
+import http.server
+import socketserver
+
+class Handler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b'OK')
+
+if __name__ == '__main__':
+    with socketserver.TCPServer(('', 80), Handler) as httpd:
+        httpd.serve_forever()
+EOF
+
+# Run the health check server in the background
+nohup python3 /usr/local/bin/healthcheck-server.py &>/dev/null &
