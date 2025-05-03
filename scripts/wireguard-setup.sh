@@ -118,59 +118,11 @@ iptables -F
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 service iptables save
 
-# Configure web server
-mkdir -p /var/www/html
-
-cat > /var/www/html/index.html << EOF
-<!DOCTYPE html>
-<html>
-<head>
-    <title>WireGuard VPN Config</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        h1 { color: #333; }
-        .config { background: #f4f4f4; padding: 15px; border-radius: 4px; white-space: pre-wrap; overflow-x: auto; }
-        .qrcode { margin-top: 20px; text-align: center; }
-    </style>
-</head>
-<body>
-    <h1>WireGuard VPN Configuration</h1>
-    <p>To use this VPN on your iPhone:</p>
-    <ol>
-        <li>Install the WireGuard app from the App Store</li>
-        <li>Scan the QR code below using the WireGuard app</li>
-        <li>OR copy the configuration text and create a tunnel manually</li>
-    </ol>
-    <h2>Configuration:</h2>
-    <pre class="config">$(cat /etc/wireguard/client.conf)</pre>
-    <div class="qrcode">
-        <h2>QR Code for Mobile App:</h2>
-        <img src="qrcode.png" alt="WireGuard QR Code">
-    </div>
-    <h2>Status:</h2>
-    <pre class="config">$(wg show)</pre>
-    <h2>Diagnostics:</h2>
-    <pre class="config">
-        IP Forwarding: $(cat /proc/sys/net/ipv4/ip_forward)
-        NAT Rules: $(iptables -t nat -L POSTROUTING -n -v)
-        DNS Server: $CLIENT_DNS
-    </pre>
-    <h2>Malware Protection:</h2>
-    <pre class="config">
-        Malware Protection: ${MALWARE_DNS_IP:+Enabled (using server $MALWARE_DNS_IP)}${MALWARE_DNS_IP:+<br>}${MALWARE_DNS_IP:-Disabled (using standard DNS $CLIENT_DNS)}
-    </pre>
-</body>
-</html>
-EOF
-
-# Generate QR code image from config
-qrencode -t PNG -o /var/www/html/qrcode.png < /etc/wireguard/client.conf
-
-# Set permissions
-chmod 644 /var/www/html/qrcode.png
-chmod 644 /var/www/html/index.html
-
-systemctl enable httpd
-systemctl start httpd
+# Final message and QR code
 
 echo "WireGuard VPN server setup complete!"
+echo "Scan this QR code with your WireGuard mobile app:"
+qrencode -t ANSIUTF8 < /etc/wireguard/client.conf
+
+echo "\nTo retrieve your config, use AWS SSM Session Manager to access the file securely."
+echo "You can also copy the config from /etc/wireguard/client.conf if needed."
