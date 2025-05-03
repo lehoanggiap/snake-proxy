@@ -21,7 +21,7 @@ const vpcId = app.node.tryGetContext('vpcId');
 const domainName = app.node.tryGetContext('domainName');
 const subdomain = app.node.tryGetContext('subdomain');
 const yourIp = app.node.tryGetContext('yourIp');
-const whitelistDomainsParameter = app.node.tryGetContext('whitelistDomainsParameter') || '/snake-dns/whilelist-domains';
+const whitelistDomainsParameter = app.node.tryGetContext('whitelistDomainsParameter');
 
 // Build config objects
 const commonConfig = {

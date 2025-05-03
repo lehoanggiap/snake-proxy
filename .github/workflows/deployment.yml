@@ -48,11 +48,12 @@ jobs:
           PARENT_HOSTED_ZONE_ID: ${{ secrets.PARENT_HOSTED_ZONE_ID }}
           PARENT_DOMAIN_NAME: ${{ secrets.PARENT_DOMAIN_NAME }}
           ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}
-          VPC_ID: ${{ secrets.VPC_ID }}
+          VPC_ID: ${{ secrets.VPC_ID }} 
           DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
           SUBDOMAIN: ${{ secrets.SUBDOMAIN }}
           YOUR_IP: ${{ secrets.YOUR_IP }}
           REGION: ${{ secrets.REGION }}
+          WHITELIST_DOMAINS: ${{ secrets.WHITELIST_DOMAINS }}
         run: |
           npx cdk deploy --require-approval never \
             -c env=${ENV} \
@@ -63,4 +64,5 @@ jobs:
             -c vpcId=${VPC_ID} \
             -c domainName=${DOMAIN_NAME} \
             -c subdomain=${SUBDOMAIN} \
-            -c yourIp=${YOUR_IP}
+            -c yourIp=${YOUR_IP} \
+            -c whitelistDomainsParameter=${WHITELIST_DOMAINS}
