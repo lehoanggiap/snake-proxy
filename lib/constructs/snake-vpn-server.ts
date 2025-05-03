@@ -3,7 +3,6 @@ import * as path from 'path';
 
 import * as cdk from 'aws-cdk-lib';
 import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
-import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
@@ -79,38 +78,15 @@ export class SnakeVPNServer extends Construct {
 
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3A, ec2.InstanceSize.MICRO),
       machineImage: new ec2.AmazonLinuxImage({
-        generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
+        generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2023,
       }),
       role,
-      minCapacity: 0,
+      minCapacity: 1,
       maxCapacity: 1,
       desiredCapacity: 1,
       healthCheck: autoscaling.HealthCheck.elb({ grace: cdk.Duration.seconds(60) }),
       userData,
       updatePolicy: autoscaling.UpdatePolicy.replacingUpdate(),
-    });
-
-    // Add scaling policies based on network packets
-    const connectionMetric = new cloudwatch.Metric({
-      namespace: 'AWS/EC2',
-      metricName: 'NetworkPacketsIn',
-      dimensionsMap: {
-        AutoScalingGroupName: this.autoScalingGroup.autoScalingGroupName,
-      },
-      statistic: 'Average',
-      period: cdk.Duration.minutes(5),
-    });
-
-    // Scale in to zero when packet count is low (just background traffic)
-    this.autoScalingGroup.scaleOnMetric('ScaleToZeroOnNoConnections', {
-      metric: connectionMetric,
-      scalingSteps: [
-        { upper: 450, change: -1 }, // Scale in if less than 450 packets (background traffic)
-        { lower: 450, change: 1 }, // Scale out to 1 instance if more than 450 packets
-      ],
-      adjustmentType: autoscaling.AdjustmentType.CHANGE_IN_CAPACITY,
-      evaluationPeriods: 1, // Scale down after 1 period of 5 minutes
-      cooldown: cdk.Duration.minutes(5),
     });
 
     // Outputs

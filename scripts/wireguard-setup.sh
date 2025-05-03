@@ -19,24 +19,18 @@ Content-Disposition: attachment; filename="userdata.txt"
 
 #!/bin/bash
 
-# Download WireGuard repository configuration for EPEL (Extra Packages for Enterprise Linux) 7
-sudo curl -Lo /etc/yum.repos.d/wireguard.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
+# Clean package cache
+sudo dnf clean all
 
 # Install required packages
-sudo yum install -y jq awscli qrencode httpd iptables-services
+sudo dnf install -y jq awscli qrencode httpd iptables-services wireguard-tools
 
 # Install AWS SSM Agent
-sudo yum install -y amazon-ssm-agent
+sudo dnf install -y amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent
 sudo systemctl start amazon-ssm-agent
 
-# Enable EPEL repo on the Amazon Linux
-sudo amazon-linux-extras install -y epel
-# Install the the EPEL repository so that we can get the extra packages which include WireGuard
-sudo yum install -y epel-release
-
-# Install the WireGuard kernel module and tools
-sudo yum install -y wireguard-dkms wireguard-tools
+sudo dnf install -y wireguard-tools
 
 # Check if WireGuard is installed
 echo "WireGuard installation status"
@@ -98,7 +92,7 @@ cat > /etc/wireguard/client.conf << EOF
 [Interface]
 PrivateKey = $(cat client_private_key)
 Address = 10.20.10.2/24
-DNS = $CLIENT_DNS
+DNS = 8.8.8.8
 
 [Peer]
 PublicKey = $(cat server_public_key)

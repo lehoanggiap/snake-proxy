@@ -1,28 +1,43 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib';
 
-import { Environment, EnvironmentConfig, CommonConfig } from '../lib/models';
+import { Environment } from '../lib/models';
 import { SnakeMalwareProtectionStack } from '../lib/stacks/snake-malware-protection-stack';
 import { SnakeVpnStack } from '../lib/stacks/snake-vpn-stack';
 import { SnakeSubdomainStack } from '../lib/stacks/snake-vpn-subdomain-stack';
 
 const app = new cdk.App();
 
-// Determine environment from config option
-const configEnv = (app.node.tryGetContext('config') || process.env.CDK_CONFIG || 'dev') as Environment;
+// Determine environment from context
+const configEnv = (app.node.tryGetContext('env') || process.env.CDK_ENV || 'dev') as Environment;
 console.log(`Loading configuration for environment: ${configEnv}`);
 
-// Get environment-specific configuration and common configuration
-const envConfig = app.node.tryGetContext(configEnv) as EnvironmentConfig;
-const commonConfig = app.node.tryGetContext('common') as CommonConfig;
+// Read all context values from command line
+const parentHostedZoneId = app.node.tryGetContext('parentHostedZoneId');
+const parentDomainName = app.node.tryGetContext('parentDomainName');
+const accountId = app.node.tryGetContext('accountId');
+const region = app.node.tryGetContext('region') || 'us-east-1';
+const vpcId = app.node.tryGetContext('vpcId');
+const domainName = app.node.tryGetContext('domainName');
+const subdomain = app.node.tryGetContext('subdomain');
+const yourIp = app.node.tryGetContext('yourIp');
+const whitelistDomainsParameter = app.node.tryGetContext('whitelistDomainsParameter') || '/snake-dns/whilelist-domains';
 
-if (!envConfig) {
-  throw new Error(`No configuration found for ${configEnv} environment in cdk.json`);
-}
+// Build config objects
+const commonConfig = {
+  parentHostedZoneId,
+  parentDomainName,
+  region,
+  accountId,
+  whitelistDomainsParameter,
+};
 
-if (!commonConfig) {
-  throw new Error('Common configuration not found in cdk.json');
-}
+const envConfig = {
+  vpcId,
+  domainName,
+  subdomain,
+  yourIp,
+};
 
 // Log the configuration being used
 console.log(`Environment: ${configEnv}`);
@@ -30,8 +45,8 @@ console.log(`Environment Configuration: ${JSON.stringify(envConfig, null, 2)}`);
 console.log(`Common Configuration: ${JSON.stringify(commonConfig, null, 2)}`);
 
 const env = {
-  account: commonConfig.accountId,
-  region: commonConfig.region,
+  account: accountId,
+  region: region,
 };
 
 // Create the Subdomain stack for the current environment
@@ -50,7 +65,7 @@ const subdomainStack = new SnakeSubdomainStack(app, `Snake-Subdomain-Stack-${con
 const malwareProtectionStack = new SnakeMalwareProtectionStack(app, `Snake-Malware-Protection-Stack-${configEnv}`, {
   envConfig,
   environment: configEnv,
-  common: commonConfig, // Pass the common configuration
+  common: commonConfig,
   env,
   tags: {
     Service: 'MalwareProtection',

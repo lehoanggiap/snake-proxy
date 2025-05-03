@@ -8,3 +8,8 @@ node_modules
 cdk.out
 
 local/
+
+.idea/
+.vscode/
+
+cdk.context.json
