@@ -46,12 +46,6 @@ SERVER_PUBLIC_KEY="__SERVER_PUBLIC_KEY__"
 CLIENT_PRIVATE_KEY="__CLIENT_PRIVATE_KEY__"
 CLIENT_PUBLIC_KEY="__CLIENT_PUBLIC_KEY__"
 
-# Get the Load Balancer IP
-# LB_IP=$(dig +short __FULL_DOMAIN_NAME__ | head -n 1)
-
-# Echo the Load Balancer IP
-# echo "Load Balancer IP: $LB_IP"
-
 # Get the Malware Protection DNS server IP directly from infrastructure
 MALWARE_DNS_IP="__MALWARE_PROTECTION_DNS_IP__"
 
