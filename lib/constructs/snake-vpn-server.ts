@@ -110,14 +110,14 @@ export class SnakeVPNServer extends Construct {
       vpcSubnets: vpcSubnets || { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
       securityGroup: this.securityGroup,
 
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3A, ec2.InstanceSize.MICRO),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3A, ec2.InstanceSize.MEDIUM),
       machineImage: new ec2.AmazonLinuxImage({
         generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2023,
       }),
       role,
-      minCapacity: 2,
-      maxCapacity: 2,
-      desiredCapacity: 2,
+      minCapacity: 1,
+      maxCapacity: 1,
+      desiredCapacity: 1,
       healthCheck: autoscaling.HealthCheck.elb({ grace: cdk.Duration.seconds(60) }),
       userData,
       updatePolicy: autoscaling.UpdatePolicy.replacingUpdate(),
