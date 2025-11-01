@@ -1,0 +1,10 @@
+1. Self-Hosted Zero Trust Network Access (ZTNA)
+Why: It builds on your VPN experience, but adds identity-based access controls and modern security principles.
+Stack: WireGuard / Tailscale / Cloudflare Tunnel, OAuth2 Proxy, Nginx
+Features to include:
+
+Role-based access to internal services (e.g., private dashboards)
+
+Integration with Google or GitHub for login
+
+Infrastructure as Code (Terraform/Ansible)
