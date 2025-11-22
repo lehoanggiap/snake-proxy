@@ -110,7 +110,7 @@ export class SnakeVPNServer extends Construct {
       vpcSubnets: vpcSubnets || { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
       securityGroup: this.securityGroup,
 
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.XLARGE2),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.C5N, ec2.InstanceSize.XLARGE9),
       machineImage: new ec2.AmazonLinuxImage({
         generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2023,
       }),
