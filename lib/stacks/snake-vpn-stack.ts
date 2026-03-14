@@ -40,16 +40,16 @@ export class SnakeVpnStack extends cdk.Stack {
     });
 
     // Get the malware protection DNS IP from either props or import from CloudFormation
-    let malwareDnsIp = malwareProtectionDnsIp;
-    if (!malwareDnsIp) {
-      try {
-        malwareDnsIp = cdk.Fn.importValue(`Snake-Malware-DNS-IP-${environment}`).toString();
-        console.log(`Imported Malware Protection DNS IP: ${malwareDnsIp}`);
-      } catch (error) {
-        console.warn('Could not import Malware Protection DNS IP. DNS protection might not work properly.');
-        malwareDnsIp = '';
-      }
-    }
+    const malwareDnsIp = malwareProtectionDnsIp;
+    // if (!malwareDnsIp) {
+    //   try {
+    //     malwareDnsIp = cdk.Fn.importValue(`Snake-Malware-DNS-IP-${environment}`).toString();
+    //     console.log(`Imported Malware Protection DNS IP: ${malwareDnsIp}`);
+    //   } catch (error) {
+    //     console.warn('Could not import Malware Protection DNS IP. DNS protection might not work properly.');
+    //     malwareDnsIp = '';
+    //   }
+    // }
 
     // Create VPN server in private subnet
     const snakeServer = new SnakeVPNServer(this, `Snake-VPN-Server-${environment}`, {
