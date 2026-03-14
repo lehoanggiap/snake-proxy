@@ -70,23 +70,23 @@ const subdomainStack = new SnakeSubdomainStack(app, `Snake-Subdomain-Stack-${con
 });
 
 // Create the Malware Protection stack with environment-specific configuration
-const malwareProtectionStack = new SnakeMalwareProtectionStack(app, `Snake-Malware-Protection-Stack-${configEnv}`, {
-  envConfig,
-  environment: configEnv,
-  common: commonConfig,
-  env,
-  tags: {
-    Service: 'MalwareProtection',
-    Environment: configEnv,
-  },
-});
+// const malwareProtectionStack = new SnakeMalwareProtectionStack(app, `Snake-Malware-Protection-Stack-${configEnv}`, {
+//   envConfig,
+//   environment: configEnv,
+//   common: commonConfig,
+//   env,
+//   tags: {
+//     Service: 'MalwareProtection',
+//     Environment: configEnv,
+//   },
+// });
 
 // Create the VPN stack with environment-specific configuration
 const vpnStack = new SnakeVpnStack(app, `Snake-Vpn-Stack-${configEnv}`, {
   envConfig,
   environment: configEnv,
   common: commonConfig,
-  malwareProtectionDnsIp: malwareProtectionStack.malwareDnsServer.privateIp,
+  // malwareProtectionDnsIp: malwareProtectionStack.malwareDnsServer.privateIp,
   env,
   tags: {
     Environment: configEnv,
@@ -97,4 +97,4 @@ const vpnStack = new SnakeVpnStack(app, `Snake-Vpn-Stack-${configEnv}`, {
 vpnStack.addDependency(subdomainStack);
 
 // Make VPN stack depend on Malware Protection stack
-vpnStack.addDependency(malwareProtectionStack);
+// vpnStack.addDependency(malwareProtectionStack);
