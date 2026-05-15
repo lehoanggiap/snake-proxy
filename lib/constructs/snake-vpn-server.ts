@@ -15,6 +15,7 @@ export interface SnakeVPNServerProps {
   domainName: string;
   subdomain: string;
   fullDomainName: string;
+  nlbDnsName: string;
   nlbSecurityGroup: ec2.ISecurityGroup;
   vpcSubnets?: ec2.SubnetSelection;
   malwareProtectionDnsIp?: string;
@@ -39,6 +40,7 @@ export class SnakeVPNServer extends Construct {
       vpc,
       environment,
       fullDomainName,
+      nlbDnsName,
       nlbSecurityGroup,
       vpcSubnets,
       malwareProtectionDnsIp,
@@ -101,6 +103,7 @@ export class SnakeVPNServer extends Construct {
 
     const userData = ec2.UserData.custom(this.loadUserDataScript(
       fullDomainName,
+      nlbDnsName,
       malwareProtectionDnsIp),
     );
 
@@ -130,13 +133,14 @@ export class SnakeVPNServer extends Construct {
     });
   }
 
-  private loadUserDataScript(fullDomainName: string, malwareProtectionDnsIp?: string): string {
+  private loadUserDataScript(fullDomainName: string, nlbDnsName: string, malwareProtectionDnsIp?: string): string {
     // Load the base script
     const scriptPath = path.join(__dirname, '..', '..', 'scripts', 'wireguard-setup.sh');
     let script = fs.readFileSync(scriptPath, 'utf8');
 
     // Replace placeholders with actual values
     script = script.replace(/__FULL_DOMAIN_NAME__/g, fullDomainName);
+    script = script.replace(/__NLB_DNS_NAME__/g, nlbDnsName);
     script = script.replace('__SERVER_PRIVATE_KEY__', this.serverPrivateKey);
     script = script.replace('__SERVER_PUBLIC_KEY__', this.serverPublicKey);
     script = script.replace('__CLIENT_PRIVATE_KEY__', this.clientPrivateKey);

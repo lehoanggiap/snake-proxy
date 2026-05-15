@@ -85,7 +85,15 @@ EOF
 # Start the WireGuard service
 sudo systemctl start wg-quick@wg0
 
-ENDPOINT="__FULL_DOMAIN_NAME__:51820"
+NLB_DNS_NAME="__NLB_DNS_NAME__"
+LB_IP="$(getent ahostsv4 "$NLB_DNS_NAME" | awk '{ print $1; exit }')"
+
+if [ -n "$LB_IP" ]; then
+  ENDPOINT="${LB_IP}:51820"
+else
+  echo "Could not resolve NLB IP from $NLB_DNS_NAME, using DNS name as endpoint"
+  ENDPOINT="${NLB_DNS_NAME}:51820"
+fi
 
 # Create client configuration file
 cat > /etc/wireguard/client.conf << EOF

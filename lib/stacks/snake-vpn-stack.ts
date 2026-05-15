@@ -28,10 +28,10 @@ export class SnakeVpnStack extends cdk.Stack {
       ownerAccountId: common.accountId,
     });
 
-    const domainHostedZone = route53.HostedZone.fromHostedZoneAttributes(this, 'ImportedHostedZone', {
-      hostedZoneId: cdk.Fn.importValue(`${envConfig.domainName.replace(/\./g, '-')}-zone-id`),
-      zoneName: envConfig.domainName,
-    });
+    // const domainHostedZone = route53.HostedZone.fromHostedZoneAttributes(this, 'ImportedHostedZone', {
+    //   hostedZoneId: cdk.Fn.importValue(`${envConfig.domainName.replace(/\./g, '-')}-zone-id`),
+    //   zoneName: envConfig.domainName,
+    // });
 
     const snakeNlb = new SnakeVPNLoadBalancer(this, `Snake-VPN-Load-Balancer-${environment}`, {
       vpc: snakeVpc,
@@ -59,6 +59,7 @@ export class SnakeVpnStack extends cdk.Stack {
       domainName: envConfig.domainName,
       subdomain: envConfig.subdomain,
       fullDomainName: `${envConfig.subdomain}.${envConfig.domainName}`,
+      nlbDnsName: snakeNlb.nlb.loadBalancerDnsName,
       nlbSecurityGroup: snakeNlb.securityGroup,
       vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
       malwareProtectionDnsIp: malwareDnsIp, // Pass the DNS IP directly to the VPN server
@@ -72,10 +73,10 @@ export class SnakeVpnStack extends cdk.Stack {
     snakeNlb.addTarget(snakeServer.autoScalingGroup);
 
     // Update DNS record to point to NLB
-    new route53.ARecord(this, `Snake-VPN-Record-${environment}`, {
-      zone: domainHostedZone,
-      recordName: envConfig.subdomain,
-      target: route53.RecordTarget.fromAlias(new route53Targets.LoadBalancerTarget(snakeNlb.nlb)),
-    });
+    // new route53.ARecord(this, `Snake-VPN-Record-${environment}`, {
+    //   zone: domainHostedZone,
+    //   recordName: envConfig.subdomain,
+    //   target: route53.RecordTarget.fromAlias(new route53Targets.LoadBalancerTarget(snakeNlb.nlb)),
+    // });
   }
 }

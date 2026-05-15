@@ -58,16 +58,16 @@ const env = {
 };
 
 // Create the Subdomain stack for the current environment
-const subdomainStack = new SnakeSubdomainStack(app, `Snake-Subdomain-Stack-${configEnv}`, {
-  parentHostedZoneId: commonConfig.parentHostedZoneId,
-  parentDomainName: commonConfig.parentDomainName,
-  environment: configEnv,
-  env,
-  tags: {
-    Service: 'DNS',
-    Environment: configEnv,
-  },
-});
+// const subdomainStack = new SnakeSubdomainStack(app, `Snake-Subdomain-Stack-${configEnv}`, {
+//   parentHostedZoneId: commonConfig.parentHostedZoneId,
+//   parentDomainName: commonConfig.parentDomainName,
+//   environment: configEnv,
+//   env,
+//   tags: {
+//     Service: 'DNS',
+//     Environment: configEnv,
+//   },
+// });
 
 // Create the Malware Protection stack with environment-specific configuration
 // const malwareProtectionStack = new SnakeMalwareProtectionStack(app, `Snake-Malware-Protection-Stack-${configEnv}`, {
@@ -94,7 +94,7 @@ const vpnStack = new SnakeVpnStack(app, `Snake-Vpn-Stack-${configEnv}`, {
 });
 
 // Make VPN stack depend on Subdomain stack
-vpnStack.addDependency(subdomainStack);
+// vpnStack.addDependency(subdomainStack);
 
 // Make VPN stack depend on Malware Protection stack
 // vpnStack.addDependency(malwareProtectionStack);
